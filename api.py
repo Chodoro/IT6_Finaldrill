@@ -29,8 +29,8 @@ def execute_query(query, args=()):
 
 @app.route("/")
 def welcome():
-    return """<h1>Employee Database</h1>
-    <p>Click <a href="/employees">here</a> to view all employees</p>"""
+    return """<h1>Amazing, Creative, and Exceptional Employee Database (ACE)</h1>
+    <p>Click <a href="/employees">here</a> to view ACE employees</p>"""
 
 @app.route("/employees", methods=["GET"])
 def get_employees():
