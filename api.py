@@ -11,14 +11,14 @@ app.config["MYSQL_DB"] = "company"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
 mysql = MySQL(app)
-
+# Fetch data from the database
 def fetch_data(query, args=()):
     cur = mysql.connection.cursor()
     cur.execute(query, args)
     data = cur.fetchall()
     cur.close()
     return data
-
+# Executes a query that modifies data
 def execute_query(query, args=()):
     cur = mysql.connection.cursor()
     cur.execute(query, args)
@@ -26,12 +26,12 @@ def execute_query(query, args=()):
     affected_rows = cur.rowcount
     cur.close()
     return affected_rows
-
+# Welcome/Homepage
 @app.route("/")
 def welcome():
     return """<h1>Amazing, Creative, and Exceptional Employee DatabACE</h1>
     <p>Click <a href="/employees">here</a> to view ACE employees</p>"""
-
+#
 @app.route("/employees", methods=["GET"])
 def get_employees():
     try:
@@ -39,7 +39,7 @@ def get_employees():
         return make_response(jsonify(data), 200)
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
-
+# read function 
 @app.route("/employees/<int:ssn>", methods=["GET"])
 def get_employee_by_ssn(ssn):
     try:
@@ -50,7 +50,7 @@ def get_employee_by_ssn(ssn):
             return make_response(jsonify({"Error": "Employee not found"}), 404)
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
-
+# add/create employee function
 @app.route("/employees", methods=["POST"])
 def add_employee():
     try:
@@ -67,7 +67,7 @@ def add_employee():
         return make_response(jsonify({"Message": "New Employee Added!", "Affected Rows": affected_rows}), 201)
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
-
+# update employee data function
 @app.route("/employees/<int:ssn>", methods=["PUT"])
 def update_employee(ssn):
     try:
@@ -87,7 +87,7 @@ def update_employee(ssn):
         return make_response(jsonify({"Message": "Employee Updated!", "Affected Rows": affected_rows}), 200)
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
-
+# delete employee function
 @app.route("/employees/<int:ssn>", methods=["DELETE"])
 def delete_employee(ssn):
     try:
@@ -97,7 +97,7 @@ def delete_employee(ssn):
         return make_response(jsonify({"Message": "Employee Deleted!", "Affected Rows": affected_rows}), 200)
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
-
+# search feature for postman
 @app.route("/employees/search", methods=["GET"])
 def search_employees():
     try:
