@@ -31,21 +31,21 @@ def execute_query(query, args=()):
 def welcome():
     return """<h1>Amazing, Creative, and Exceptional Employee DatabACE</h1>
     <p>Click <a href="/employees">here</a> to view ACE employees</p>"""
-#
+
 @app.route("/employees", methods=["GET"])
 def get_employees():
     try:
-        data = fetch_data("SELECT * FROM employee")
-        return make_response(jsonify(data), 200)
+        data = fetch_data("SELECT * FROM employee") #fetches all employee data
+        return make_response(jsonify(data), 200)    #returns the data as JSON
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
 # read function 
 @app.route("/employees/<int:ssn>", methods=["GET"])
 def get_employee_by_ssn(ssn):
     try:
-        data = fetch_data("SELECT * FROM employee WHERE ssn = %s", (ssn,))
+        data = fetch_data("SELECT * FROM employee WHERE ssn = %s", (ssn,)) #fetches employee by JSON
         if data:
-            return make_response(jsonify(data), 200)
+            return make_response(jsonify(data), 200)    #returns the data as JSON
         else:
             return make_response(jsonify({"Error": "Employee not found"}), 404)
     except Exception as e:
@@ -54,15 +54,15 @@ def get_employee_by_ssn(ssn):
 @app.route("/employees", methods=["POST"])
 def add_employee():
     try:
-        info = request.get_json()
-        required_fields = ["Fname", "Minit", "Lname", "Bdate", "Address", "Sex", "Salary", "Super_ssn", "DL_id"]
+        info = request.get_json() #gets the JSON data from the request
+        required_fields = ["Fname", "Minit", "Lname", "Bdate", "Address", "Sex", "Salary", "Super_ssn", "DL_id"]    #checks if all the requirements are
         if not all(field in info for field in required_fields):
             return make_response(jsonify({"Error": "Missing required fields"}), 400)
 
         query = """INSERT INTO employee (Fname, Minit, Lname, Bdate, Address, Sex, Salary, Super_ssn, DL_id) 
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""   #insert query
         args = (info["Fname"], info["Minit"], info["Lname"], info["Bdate"], info["Address"], info["Sex"], info["Salary"], info["Super_ssn"], info["DL_id"])
-        affected_rows = execute_query(query, args)
+        affected_rows = execute_query(query, args)  #execute insert query
 
         return make_response(jsonify({"Message": "New Employee Added!", "Affected Rows": affected_rows}), 201)
     except Exception as e:
@@ -71,16 +71,16 @@ def add_employee():
 @app.route("/employees/<int:ssn>", methods=["PUT"])
 def update_employee(ssn):
     try:
-        info = request.get_json()
+        info = request.get_json()   #gets the JSON data from the request
         required_fields = ["Fname", "Minit", "Lname", "Bdate", "Address", "Sex", "Salary", "Super_ssn", "DL_id"]
         if not all(field in info for field in required_fields):
             return make_response(jsonify({"Error": "Missing required fields"}), 400)
 
         query = """UPDATE employee
                    SET Fname = %s, Minit = %s, Lname = %s, Bdate = %s, Address = %s, Sex = %s, Salary = %s, Super_ssn = %s, DL_id = %s 
-                   WHERE ssn = %s"""
+                   WHERE ssn = %s"""    #update query
         args = (info["Fname"], info["Minit"], info["Lname"], info["Bdate"], info["Address"], info["Sex"], info["Salary"], info["Super_ssn"], info["DL_id"], ssn)
-        affected_rows = execute_query(query, args)
+        affected_rows = execute_query(query, args)  #executes update query
 
         if affected_rows == 0:
             return make_response(jsonify({"Error": "Employee not found"}), 404)
@@ -91,7 +91,7 @@ def update_employee(ssn):
 @app.route("/employees/<int:ssn>", methods=["DELETE"])
 def delete_employee(ssn):
     try:
-        affected_rows = execute_query("DELETE FROM employee WHERE ssn = %s", (ssn,))
+        affected_rows = execute_query("DELETE FROM employee WHERE ssn = %s", (ssn,))    #deletes employee based on ssn
         if affected_rows == 0:
             return make_response(jsonify({"Error": "Employee not found"}), 404)
         return make_response(jsonify({"Message": "Employee Deleted!", "Affected Rows": affected_rows}), 200)
@@ -101,8 +101,8 @@ def delete_employee(ssn):
 @app.route("/employees/search", methods=["GET"])
 def search_employees():
     try:
-        query_params = request.args
-        query = "SELECT * FROM employee WHERE "
+        query_params = request.args     #get query parameters from URL
+        query = "SELECT * FROM employee WHERE "     #start of the search query
         conditions = []
         values = []
 
@@ -128,10 +128,10 @@ def search_employees():
         if not conditions:
             return make_response(jsonify({"Error": "No valid search criteria provided."}), 400)
 
-        query += " AND ".join(conditions)
+        query += " AND ".join(conditions)   #combines the search conditions to form final query
 
         data = fetch_data(query, tuple(values))
-        return make_response(jsonify(data), 200)
+        return make_response(jsonify(data), 200)    #returns search results as JSON
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
 
