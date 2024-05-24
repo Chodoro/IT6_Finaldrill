@@ -29,7 +29,7 @@ def execute_query(query, args=()):
 
 @app.route("/")
 def welcome():
-    return """<h1>Amazing, Creative, and Exceptional Employee Database (ACE)</h1>
+    return """<h1>Amazing, Creative, and Exceptional Employee DatabACE</h1>
     <p>Click <a href="/employees">here</a> to view ACE employees</p>"""
 
 @app.route("/employees", methods=["GET"])
@@ -95,6 +95,43 @@ def delete_employee(ssn):
         if affected_rows == 0:
             return make_response(jsonify({"Error": "Employee not found"}), 404)
         return make_response(jsonify({"Message": "Employee Deleted!", "Affected Rows": affected_rows}), 200)
+    except Exception as e:
+        return make_response(jsonify({"Error": str(e)}), 500)
+
+@app.route("/employees/search", methods=["GET"])
+def search_employees():
+    try:
+        query_params = request.args
+        query = "SELECT * FROM employee WHERE "
+        conditions = []
+        values = []
+
+        if 'Fname' in query_params:
+            conditions.append("Fname LIKE %s")
+            values.append(f"%{query_params.get('Fname')}%")
+        if 'Lname' in query_params:
+            conditions.append("Lname LIKE %s")
+            values.append(f"%{query_params.get('Lname')}%")
+        if 'Address' in query_params:
+            conditions.append("Address LIKE %s")
+            values.append(f"%{query_params.get('Address')}%")
+        if 'Sex' in query_params:
+            conditions.append("Sex = %s")
+            values.append(query_params.get('Sex'))
+        if 'DL_id' in query_params:
+            conditions.append("DL_id = %s")
+            values.append(query_params.get('DL_id'))
+        if 'Super_ssn' in query_params:
+            conditions.append("Super_ssn = %s")
+            values.append(query_params.get('Super_ssn'))
+
+        if not conditions:
+            return make_response(jsonify({"Error": "No valid search criteria provided."}), 400)
+
+        query += " AND ".join(conditions)
+
+        data = fetch_data(query, tuple(values))
+        return make_response(jsonify(data), 200)
     except Exception as e:
         return make_response(jsonify({"Error": str(e)}), 500)
 
